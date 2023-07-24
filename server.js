@@ -6,21 +6,26 @@ dotenv.config({ path: 'config.env' });
 
 const dbConnection = require('./config/database');
 const categoryRouter = require('./routes/categoryRoute');
+
+// DATABASE
 dbConnection();
 
 const app = express();
+
 app.use(express.json());
 
+// Middleware
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
     console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-app.use('api/v1/categories', categoryRouter)
+// Router
+app.use('/api/v1/categories', categoryRouter)
+// app.get('/api/v1/categories', (request, response) => {
+//     response.send('Hello World');
+// });
 
-app.get('/', (request, response) => {
-    response.send('<h1>Hello API<h1/>');
-})
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
