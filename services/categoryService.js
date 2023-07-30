@@ -1,6 +1,7 @@
 const Category = require("../model/categoryModel");
 const slugify = require('slugify');
 const asyncHandler = require('express-async-handler');
+const ApiError = require("../utlis/apiError");
 
 
 // @desc get list of categories
@@ -19,12 +20,13 @@ exports.getCategories = asyncHandler(async (request, response) => {
 // @desc get category
 // @route GET /api/v1/categories/:id
 // @access Public
-exports.getCategory = asyncHandler(async (request, response) => {
+exports.getCategory = asyncHandler(async (request, response, next) => {
     const { id } = request.params;
 
     const category = await Category.findById({ _id: id });
     if (!category) {
-        response.status(404).json({ msg: `Not category for this id ${id}` });
+        // response.status(404).json({ msg: `Not category for this id ${id}` });
+        return next(new ApiError(`Not category for this id ${id}`, 404));
     }
     response.status(200).json(category);
 });
@@ -44,7 +46,7 @@ exports.createCategory = asyncHandler(async (request, response) => {
 // @desc Update category
 // @route PUT /api/v1/categories/:id
 // @access Private
-exports.updateCategory = asyncHandler(async (request, response) => {
+exports.updateCategory = asyncHandler(async (request, response, next) => {
     const { id } = request.params;
     const { name } = request.body;
 
@@ -54,7 +56,8 @@ exports.updateCategory = asyncHandler(async (request, response) => {
         { new: true }
     );
     if (!category) {
-        response.status(404).json({ msg: `Not category for this id ${id}` });
+        // response.status(404).json({ msg: `Not category for this id ${id}` });
+        return next(new ApiError(`Not category for this id ${id}`, 404));
     }
     response.status(200).json(category);
 })
@@ -63,12 +66,13 @@ exports.updateCategory = asyncHandler(async (request, response) => {
 // @desc Delete category
 // @route DELETE /api/v1/categories/:id
 // @access Private
-exports.deleteCategory = asyncHandler(async (request, response) => {
+exports.deleteCategory = asyncHandler(async (request, response, next) => {
     const { id } = request.params;
 
     const category = await Category.findByIdAndDelete(id);
     if (!category) {
-        response.status(404).json({ msg: `Not category for this id ${id}` });
+        // response.status(404).json({ msg: `Not category for this id ${id}` });
+        return next(new ApiError(`Not category for this id ${id}`, 404));
     }
     response.status(204).send();
 })
