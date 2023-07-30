@@ -1,4 +1,4 @@
-const categoryModel = require("../model/categoryModel");
+const Category = require("../model/categoryModel");
 const slugify = require('slugify');
 const asyncHandler = require('express-async-handler');
 
@@ -7,9 +7,26 @@ const asyncHandler = require('express-async-handler');
 // @route GET /api/v1/categories
 // @access Public
 exports.getCategories = asyncHandler(async (request, response) => {
+    const page = request.query.page * 1 || 1;
+    const limit = request.query.limit * 1 || 4;
+    const skip = (page - 1) * limit;
 
-    const categories = await categoryModel.find({})
-    response.status(200).json({ results: categories.length, data: categories });
+    const categories = await Category.find({}).skip(skip).limit(limit);
+    response.status(200).json({ results: categories.length, page, data: categories });
+});
+
+
+// @desc get category
+// @route GET /api/v1/categories/:id
+// @access Public
+exports.getCategory = asyncHandler(async (request, response) => {
+    const { id } = request.params;
+
+    const category = await Category.findById({ _id: id });
+    if (!category) {
+        response.status(404).json({ msg: `Not category for this id ${id}` });
+    }
+    response.status(200).json(category);
 });
 
 
@@ -19,32 +36,39 @@ exports.getCategories = asyncHandler(async (request, response) => {
 exports.createCategory = asyncHandler(async (request, response) => {
     const { name } = request.body;
 
-    const category = await categoryModel.create({ name, slug: slugify(name) })
+    const category = await Category.create({ name, slug: slugify(name) });
     response.status(201).json({ data: category });
 });
 
-exports.updateCategory = async (request, response) => {
-    const id = request.params.id;
-    const name = request.body.name;
 
-    try {
-        const category = await categoryModel.findByIdAndUpdate({ _id: id }, { name, slug: slugify(request.body.name) }, { new: true })
-        response.status(200).json(category);
-    } catch (err) {
-        response.status(500).json(err);
+// @desc Update category
+// @route PUT /api/v1/categories/:id
+// @access Private
+exports.updateCategory = asyncHandler(async (request, response) => {
+    const { id } = request.params;
+    const { name } = request.body;
+
+    const category = await Category.findByIdAndUpdate(
+        { _id: id },
+        { name, slug: slugify(name) },
+        { new: true }
+    );
+    if (!category) {
+        response.status(404).json({ msg: `Not category for this id ${id}` });
     }
-}
+    response.status(200).json(category);
+})
 
-exports.deleteCategory = async (request, response) => {
+
+// @desc Delete category
+// @route DELETE /api/v1/categories/:id
+// @access Private
+exports.deleteCategory = asyncHandler(async (request, response) => {
     const { id } = request.params;
 
-    try {
-        const category = await categoryModel.findByIdAndDelete(id)
-        if (!category) {
-            return response.status(404).json({ message: 'ERREUR' });
-        }
-        return response.status(200).json(category);
-    } catch (err) {
-        response.status(500).json(err);
+    const category = await Category.findByIdAndDelete(id);
+    if (!category) {
+        response.status(404).json({ msg: `Not category for this id ${id}` });
     }
-}
+    response.status(204).send();
+})

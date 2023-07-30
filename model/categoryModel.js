@@ -18,6 +18,6 @@ const categorySechma = new mongoose.Schema(
         timestamps: true
     });
 
-const categoryModel = mongoose.model('category', categorySechma);
+const Category = mongoose.model('category', categorySechma);
 
-module.exports = categoryModel;
+module.exports = Category;
