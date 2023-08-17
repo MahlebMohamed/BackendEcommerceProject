@@ -23,9 +23,8 @@ exports.getCategories = asyncHandler(async (request, response) => {
 exports.getCategory = asyncHandler(async (request, response, next) => {
     const { id } = request.params;
 
-    const category = await Category.findById({ _id: id });
+    const category = await Category.findById(id);
     if (!category) {
-        // response.status(404).json({ msg: `Not category for this id ${id}` });
         return next(new ApiError(`Not category for this id ${id}`, 404));
     }
     response.status(200).json(category);
@@ -56,7 +55,6 @@ exports.updateCategory = asyncHandler(async (request, response, next) => {
         { new: true }
     );
     if (!category) {
-        // response.status(404).json({ msg: `Not category for this id ${id}` });
         return next(new ApiError(`Not category for this id ${id}`, 404));
     }
     response.status(200).json(category);
@@ -71,7 +69,6 @@ exports.deleteCategory = asyncHandler(async (request, response, next) => {
 
     const category = await Category.findByIdAndDelete(id);
     if (!category) {
-        // response.status(404).json({ msg: `Not category for this id ${id}` });
         return next(new ApiError(`Not category for this id ${id}`, 404));
     }
     response.status(204).send();

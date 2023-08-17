@@ -4,7 +4,6 @@ const categorySechma = new mongoose.Schema(
     {
         name: {
             type: String,
-            required: [true, 'Category required'],
             unique: [true, 'Category must be unique'],
             minlength: [3, 'Too short category name'],
             maxlength: [32, 'Too long category name'],
@@ -12,12 +11,15 @@ const categorySechma = new mongoose.Schema(
         slug: {
             type: String,
             lowercase: true,
+        },
+        image: {
+            type: String
         }
     },
     {
         timestamps: true
     });
 
-const Category = mongoose.model('category', categorySechma);
+const Category = mongoose.model('Category', categorySechma);
 
 module.exports = Category;

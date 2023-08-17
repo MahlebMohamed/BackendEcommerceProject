@@ -7,6 +7,7 @@ const dbConnection = require('./config/database');
 const categoryRouter = require('./routes/categoryRoute');
 const ApiError = require('./utlis/apiError');
 const globalError = require('./middlewares/errorMiddleware');
+const subCategoryRouter = require('./routes/subCategoryRoute');
 
 // DATABASE
 dbConnection();
@@ -22,7 +23,9 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Router
+// app.use('/api/v1/categories/:categoryId/subcategories', subCategoryRouter)
 app.use('/api/v1/categories', categoryRouter);
+app.use('/api/v1/subCategories', subCategoryRouter);
 
 app.all('*', (request, response, next) => {
     next(new ApiError(`Can't find this route: ${request.originalUrl}`, 400));
@@ -33,6 +36,14 @@ app.use(globalError);
 
 
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`App running on port ${PORT}`);
+});
+
+process.on('unhandledRejection', (error) => {
+    console.log(`UnhandledRejection Errors: ${error.name} | ${error.message}`);
+    server.close(() => {
+        console.log(`Shutting down...`);
+        process.exit(1);
+    });
 });
