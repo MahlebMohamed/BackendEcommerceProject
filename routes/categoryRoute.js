@@ -1,5 +1,6 @@
 const express = require('express');
 const categoryRouter = express.Router();
+const multer = require('multer');
 
 const {
     getCategoryValidator,
@@ -18,11 +19,16 @@ const {
 
 const subCategoryRouter = require('./subCategoryRoute');
 
+const upload = multer({ dest: 'uploads/categories' });
+
 
 categoryRouter
     .route('/')
     .get(getCategories)
-    .post(createCategoryValidator, createCategory);
+    .post(upload.single('image'), (req, res, next) => {
+        console.log(req.file);
+        next();
+    }, createCategoryValidator, createCategory);
 
 
 categoryRouter
