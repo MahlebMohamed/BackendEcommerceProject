@@ -1,19 +1,31 @@
-const express = require('express');
-const { createProduct, getProducts, getProduct, updateProduct, deleteProduct } = require('../services/productService');
-const { deleteProductValidator, updateProductValidator, getProductValidator, createProductValidator } = require('../utlis/validators/productValidator');
+const express = require("express");
+const {
+    createProduct,
+    getProducts,
+    getProduct,
+    updateProduct,
+    deleteProduct,
+    resizeImageProduct,
+    uploadProductImage,
+} = require("../services/productService");
+const {
+    deleteProductValidator,
+    updateProductValidator,
+    getProductValidator,
+    createProductValidator,
+} = require("../utlis/validators/productValidator");
 const productRouter = express.Router();
 
 
 productRouter
-    .route('/')
+    .route("/")
     .get(getProducts)
-    .post(createProductValidator, createProduct);
+    .post(uploadProductImage, resizeImageProduct, createProductValidator, createProduct);
 
 productRouter
-    .route('/:id')
+    .route("/:id")
     .get(getProductValidator, getProduct)
-    .put(updateProductValidator, updateProduct)
+    .put(uploadProductImage, resizeImageProduct, updateProductValidator, updateProduct)
     .delete(deleteProductValidator, deleteProduct);
-
 
 module.exports = productRouter;

@@ -18,8 +18,27 @@ const categorySechma = new mongoose.Schema(
     },
     {
         timestamps: true
-    });
+    }
+);
 
-const Category = mongoose.model('Category', categorySechma);
 
-module.exports = Category;
+function setImageUrl(doc) {
+    if (doc.image) {
+        const imageUrl = `${process.env.BASE_URL}/categories/${doc.image}`;
+        doc.image = imageUrl;
+    }
+}
+
+// findOne, findAll and update
+categorySechma.post('init', (doc) => {
+    setImageUrl(doc);
+});
+
+// create
+categorySechma.post('save', (doc) => {
+    setImageUrl(doc);
+});
+
+
+
+module.exports = mongoose.model('Category', categorySechma);
